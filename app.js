@@ -187,22 +187,28 @@ function updateActiveTimers() {
   const activeGateIds = new Set();
 
   state.allGates.forEach((gate) => {
-    if (gate.status === "green" && gate.monitor_start) {
+    if (gate.status === "green" && gate.scheduled_time) {
       activeGateIds.add(gate.id);
 
       if (!state.activeTimers[gate.id]) {
-        // Ny aktiv timer
-        const startTime = gate.monitor_start.toDate().getTime();
-
-        // ## HER ER ÆNDRINGEN ##
-        // Læs ekstra tid fra gaten. Hvis feltet ikke findes, er det 0.
-        const extraMinutes = gate.extra_time_minutes || 0;
-        // Beregn den samlede varighed
-        const baseDurationMinutes = gate.type === "ARR" ? 25 : 30;
-        const totalDurationMs =
-          (baseDurationMinutes + extraMinutes) * 60 * 1000;
-
-        const stopTime = startTime + totalDurationMs;
+        let startTime, stopTime;
+        if (gate.type === "ARR") {
+          // Overvågning starter ved scheduled_time og varer 25 min
+          startTime = gate.scheduled_time.toDate().getTime();
+          stopTime = startTime + 25 * 60 * 1000;
+        } else if (gate.type === "DEP") {
+          // Overvågning starter 30 min før scheduled_time og slutter ved scheduled_time
+          stopTime = gate.scheduled_time.toDate().getTime();
+          startTime = stopTime - 30 * 60 * 1000;
+        } else {
+          // fallback: brug monitor_start hvis tilgængelig
+          startTime =
+            gate.monitor_start?.toDate().getTime() ||
+            gate.scheduled_time.toDate().getTime();
+          stopTime = startTime + 25 * 60 * 1000;
+        }
+        // Hvis nuværende tidspunkt er før startTime, så ingen aktiv timer endnu
+        if (now < startTime) return;
 
         state.activeTimers[gate.id] = {
           stopTime: stopTime,
