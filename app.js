@@ -284,6 +284,7 @@ function init() {
       e.target.classList.contains("modal-overlay");
     const muteButton = e.target.closest("#mute-button");
     const tabButton = e.target.closest(".tab-button"); // <-- ÆNDRING 1
+    const resetButton = e.target.closest("#reset-all-button");
 
     if (guardButton) {
       state.currentGuardId = guardButton.dataset.guardId;
@@ -333,6 +334,19 @@ function init() {
     } else if (muteButton) {
       state.isMuted = !state.isMuted;
       UI.setMuteButtonState(state.isMuted);
+    } else if (resetButton) {
+      const confirmed = confirm(
+        "Er du sikker på, at du vil nulstille ALLE gates? Dette fjerner alle vagttildelinger og aktive overvågninger.",
+      );
+      if (confirmed) {
+        try {
+          const count = await Data.nulstilAlleGates();
+          alert(`${count} gates blev succesfuldt nulstillet.`);
+        } catch (error) {
+          alert("Der opstod en fejl under nulstilling.");
+          console.error("Fejl ved nulstilling af gates:", error);
+        }
+      }
     }
   });
 

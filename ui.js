@@ -226,18 +226,28 @@ export function renderGatesDashboard(gates) {
     return acc;
   }, {});
 
-  // Opret en sektion for hver gruppe
-  for (const section in gatesBySection) {
+  // NYT: Sortér sektionerne (A, B, C...) alfabetisk
+  const sortedSections = Object.keys(gatesBySection).sort();
+
+  // Opret en sektion for hver sorteret gruppe
+  sortedSections.forEach((section) => {
     const sectionDiv = document.createElement("div");
     sectionDiv.className = "gate-section";
     sectionDiv.innerHTML = `<h2>${section}-Gates</h2>`;
 
-    gatesBySection[section].forEach((gate) => {
-      // Vi kan genbruge createGateCard-funktionen, men uden timer
-      const card = createGateCard(gate, null, {}); // Vi sender null som guardId for at få default farver
+    // NYT: Sortér gaterne inde i sektionen (A2 før A10)
+    const sortedGatesInSection = gatesBySection[section].sort((a, b) =>
+      a.gate_id.localeCompare(b.gate_id, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
+    );
+
+    sortedGatesInSection.forEach((gate) => {
+      const card = createGateCard(gate, null, {});
       sectionDiv.appendChild(card);
     });
 
     elements.gatesContent.appendChild(sectionDiv);
-  }
+  });
 }

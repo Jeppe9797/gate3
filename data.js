@@ -8,6 +8,7 @@ import {
   onSnapshot,
   doc,
   runTransaction,
+  getDocs,
   updateDoc,
   arrayUnion,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
@@ -40,37 +41,35 @@ export function observerGates(callback) {
  * @param {string} guardId - ID'et på vagten (f.eks. "Guard 1").
  * @returns {Promise<void>} Et promise, der resolver, hvis det lykkes, og rejecter, hvis gaten er taget.
  */
-export async function tagGate(gateId, guardId) {
-  const gateRef = doc(db, "gates", gateId);
+export async function nulstilAlleGates() {
+  const gatesCollection = collection(db, "gates");
+  const snapshot = await getDocs(gatesCollection);
 
-  try {
-    await runTransaction(db, async (transaction) => {
-      const gateDoc = await transaction.get(gateRef);
-      if (!gateDoc.exists()) {
-        throw new Error("Gaten findes ikke!");
-      }
-
-      const data = gateDoc.data();
-      if (data.responsible_guard) {
-        throw new Error(`Gaten er allerede taget af ${data.responsible_guard}`);
-      }
-
-      transaction.update(gateRef, {
-        responsible_guard: guardId,
-        status: "blue", // Status "Tildelt, nedtæller til start" (§4)
-        history: arrayUnion({
-          // Log vagt-tildelingen i historikken (§15)
-          timestamp: new Date(),
-          event: `Tildelt til ${guardId}`,
-        }),
-      });
-    });
-    console.log(`Gate ${gateId} er succesfuldt tildelt til ${guardId}`);
-  } catch (error) {
-    console.error("Fejl ved tildeling af gate:", error.message);
-    // Videresend fejlen, så UI kan reagere
-    throw error;
+  if (snapshot.empty) {
+    console.log("Ingen gates fundet at nulstille.");
+    return 0;
   }
+
+  const resetData = {
+    status: "gray",
+    responsible_guard: null,
+    monitor_start: null,
+    monitor_stop: null,
+    screen: null,
+    // Vi nulstiller IKKE scheduled_time eller history
+  };
+
+  // Loop igennem alle dokumenter og opdater dem
+  const updatePromises = [];
+  snapshot.forEach((doc) => {
+    updatePromises.push(updateDoc(doc.ref, resetData));
+  });
+
+  // Vent på at alle opdateringer er færdige
+  await Promise.all(updatePromises);
+
+  console.log(`${snapshot.size} gates blev nulstillet.`);
+  return snapshot.size;
 }
 
 /**
