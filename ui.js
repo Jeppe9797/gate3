@@ -96,6 +96,80 @@ export function showMainApp(guardId) {
   elements.mainApp.style.display = "block";
 }
 
+// MANGLERDE FUNKTIONER TIL UI-OBJEKTET
+
+// Opdaterer vagtvalgsknapperne så optagne vagter disables
+export function updateGuardSelectionUI(takenGuards = []) {
+  const guardButtons = document.querySelectorAll(".guard-button");
+  guardButtons.forEach((btn) => {
+    const guardId = btn.getAttribute("data-guard-id");
+    if (takenGuards.includes(guardId)) {
+      btn.disabled = true;
+      btn.classList.add("disabled");
+    } else {
+      btn.disabled = false;
+      btn.classList.remove("disabled");
+    }
+  });
+}
+
+// Tegner listen af gates i overvågningsfanen
+export function renderOvervaagningList(
+  gates = [],
+  currentGuardId,
+  activeTimers = {},
+) {
+  const container = document.getElementById("overvaagning-content");
+  if (!container) return;
+  if (!gates.length) {
+    container.innerHTML = "<p>Ingen gates til overvågning.</p>";
+    return;
+  }
+  container.innerHTML = gates
+    .map((gate) => {
+      const time =
+        typeof gate.scheduled_time?.toDate === "function"
+          ? gate.scheduled_time.toDate().toLocaleTimeString("da-DK", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "";
+      const statusText = gate.status || "";
+      const ansvarlig = gate.responsible_guard || "Ingen";
+      const timer = activeTimers[gate.id]?.remaining || 0;
+      return `
+      <div class="gate-card ${gate.status}">
+        <h4>${gate.gate_id || ""}</h4>
+        <p>Tid: ${time}</p>
+        <p>Status: ${statusText}</p>
+        <p>Ansvarlig: ${ansvarlig}</p>
+        <p>Overvågningstid: ${formatSecondsToHMS(timer)}</p>
+      </div>
+    `;
+    })
+    .join("");
+}
+
+// Skifter mellem "Overvågning" og "Gates" faneblade
+export function switchTab(tabId) {
+  const overvSection = document.getElementById("overvaagning-content");
+  const gatesSection = document.getElementById("gates-content");
+  const overvBtn = document.getElementById("nav-overvaagning");
+  const gatesBtn = document.getElementById("nav-gates");
+  if (!overvSection || !gatesSection || !overvBtn || !gatesBtn) return;
+  if (tabId === "nav-overvaagning") {
+    overvSection.style.display = "";
+    gatesSection.style.display = "none";
+    overvBtn.classList.add("active");
+    gatesBtn.classList.remove("active");
+  } else if (tabId === "nav-gates") {
+    overvSection.style.display = "none";
+    gatesSection.style.display = "";
+    overvBtn.classList.remove("active");
+    gatesBtn.classList.add("active");
+  }
+}
+
 // MANGLENDE DEL: Definer referencer til DOM-elementer
 const elements = {
   modal: document.getElementById("gate-details-modal"),
