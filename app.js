@@ -367,6 +367,38 @@ function init() {
       if (tabButton.id === "nav-gates") {
         UI.renderGatesDashboard(state.allGates);
       }
+    } else if (gateCard) {
+      // TEST 1: Finder den overhovedet et gate-kort?
+      console.log("✅ TRIN 1: Gate-kort fundet!", gateCard);
+
+      const gateId = gateCard.dataset.gateId;
+      // TEST 2: Kan den læse gate-id'et fra kortet?
+      console.log("... TRIN 2: Gate ID læst fra kortet:", gateId);
+
+      const gate = state.allGates.find((g) => g.id === gateId);
+      // TEST 3: Kan den finde den tilsvarende gate i vores data?
+      console.log("... TRIN 3: Gate-objekt fundet i data:", gate);
+
+      const isGatesTabActive = document
+        .getElementById("nav-gates")
+        .classList.contains("active");
+      // TEST 4: Ved den, om vi er i redigeringstilstand?
+      console.log("... TRIN 4: Er 'Gates'-fanen aktiv?", isGatesTabActive);
+
+      if (gate) {
+        // TEST 5: Forsøger den at kalde funktionen, der viser menuen?
+        console.log("🚀 TRIN 5: Kalder UI.showGateDetailsModal nu...");
+        UI.showGateDetailsModal(
+          gate,
+          state.currentGuardId,
+          state.activeTimers,
+          isGatesTabActive,
+        );
+      } else {
+        console.error(
+          "❌ FEJL: Kunne ikke kalde showGateDetailsModal, fordi gate-objektet var 'null' eller 'undefined'.",
+        );
+      }
     }
   });
 
