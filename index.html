@@ -30,21 +30,27 @@
     <!-- ## HOVEDAPPLIKATION (§3, 4, 5) ## -->
     <!-- Er skjult indtil en vagt-position er valgt -->
     <div id="main-app" style="display: none;">
+<!-- index.html -->
+
 <header>
+    <!-- Række 1: Titel og brugerinformation -->
     <div class="header-content">
-        <!-- ... Titel og brugerinfo ... -->
+        <h2>GateMonitor</h2>
+        <div id="current-user-info">
+            Logget ind som: <span id="current-guard-display"></span>
+        </div>
     </div>
     
-    <!-- NY CONTAINER FOR ALLE KONTROL-ELEMENTER -->
+    <!-- Række 2: Alle knapper og navigationsfaner -->
     <div class="header-controls">
         <button id="reset-all-button" class="icon-button" title="Nulstil alle gates">🔄</button>
-        <button id="mute-button" class="icon-button">🔊</button>
+        <button id="mute-button" class="icon-button" title="Slå lyd til/fra">🔊</button>
+        
         <nav>
             <button id="nav-overvaagning" class="tab-button active">Overvågning</button>
             <button id="nav-gates" class="tab-button">Gates</button>
         </nav>
     </div>
-
 </header>
 
         <main>
