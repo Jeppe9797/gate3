@@ -1,3 +1,7 @@
+// Skjul modal/pop-up
+export function hideGateDetailsModal() {
+  elements.modal.style.display = "none";
+}
 import { formatSecondsToHMS, formatTimestamp } from "./utils.js";
 // js/ui.js - INDSÆT HELE DENNE BLOK
 
