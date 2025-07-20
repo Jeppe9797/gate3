@@ -1,0 +1,229 @@
+/* ## GENERELT & VARIABLER ## */
+:root {
+    --color-green: #28a745;
+    --color-gray: #6c757d;
+    --color-yellow: #ffc107;
+    --color-red: #dc3545;
+    --color-blue: #007bff;
+    
+    --background-color: #f4f7f6;
+    --card-background: #ffffff;
+    --text-color: #333;
+    --border-color: #ddd;
+    --header-background: #343a40;
+    --header-text: #ffffff;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* ## OFFLINE BANNER (§9) ## */
+.banner {
+    padding: 10px;
+    background-color: var(--color-gray);
+    color: white;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+/* ## BRUGERVALG-SKÆRM (§2) ## */
+#guard-selection-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.selection-box {
+    padding: 40px;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.guard-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.guard-button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background-color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.guard-button:hover {
+    background-color: var(--color-blue);
+    color: white;
+}
+.guard-button.taken {
+    background-color: var(--color-gray);
+    color: white;
+    cursor: not-allowed;
+}
+
+
+/* ## HOVEDAPPLIKATION (§3) ## */
+#main-app header {
+    background-color: var(--header-background);
+    color: var(--header-text);
+    padding: 10px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+#main-app nav {
+    display: flex;
+    gap: 10px;
+}
+.tab-button {
+    flex-grow: 1;
+    padding: 12px;
+    background-color: #5a6268;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+}
+.tab-button.active {
+    background-color: var(--color-blue);
+}
+
+#mute-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* ## GATE LISTER & KORT (§3, 4) ## */
+main {
+    padding: 15px;
+}
+#overvaagning-content, #gates-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 15px;
+}
+
+.gate-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    border-left: 8px solid var(--color-gray); /* Default border color */
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.gate-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+/* Status farver (§4) */
+.gate-card.status-green { border-left-color: var(--color-green); }
+.gate-card.status-gray { border-left-color: var(--color-gray); }
+.gate-card.status-yellow { border-left-color: var(--color-yellow); }
+.gate-card.status-red { border-left-color: var(--color-red); }
+.gate-card.status-blue { border-left-color: var(--color-blue); }
+
+.gate-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+}
+.gate-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #555;
+}
+.gate-timer {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    color: var(--color-green);
+}
+.status-red .gate-timer {
+    color: var(--color-red);
+}
+
+/* ## GATE-DETALJER MODAL (§5) ## */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+.modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.8rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+.gate-actions-menu {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.gate-actions-menu button {
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background-color: #f0f0f0;
+}
+.gate-actions-menu button.danger {
+    background-color: var(--color-red);
+    color: white;
+    border-color: var(--color-red);
+}
+
+/* ## HJÆLPEKLASSER ## */
+.error-message {
+    color: var(--color-red);
+    font-size: 0.9rem;
+    margin-top: 10px;
+}

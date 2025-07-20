@@ -1,1 +1,106 @@
-Hej med dig
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GateMonitor</title>
+    <link rel="stylesheet" href="main.css">
+    <!-- Progressive Web App (PWA) manifest -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Ikon til hjemmeskærm -->
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+</head>
+<body>
+
+    <!-- ## OFFLINE BANNER (§9) ## -->
+    <!-- Vises kun når forbindelsen mistes -->
+    <div id="offline-banner" class="banner" style="display: none;">
+        Du er i øjeblikket offline. Visse handlinger er muligvis ikke tilgængelige.
+    </div>
+
+    <!-- ## BRUGERVALG-SKÆRM (§2) ## -->
+    <!-- Vises som det første. Skjules efter valg. -->
+    <div id="guard-selection-screen">
+        <div class="selection-box">
+            <h1>GateMonitor</h1>
+            <p>Vælg din position for at fortsætte</p>
+            <div id="guard-options" class="guard-options">
+                <button class="guard-button" data-guard-id="Guard 1">Guard 1</button>
+                <button class="guard-button" data-guard-id="Guard 2">Guard 2</button>
+                <button class="guard-button" data-guard-id="Guard 3">Guard 3</button>
+            </div>
+            <p id="guard-selection-error" class="error-message" style="display: none;"></p>
+        </div>
+    </div>
+
+    <!-- ## HOVEDAPPLIKATION (§3, 4, 5) ## -->
+    <!-- Er skjult indtil en vagt-position er valgt -->
+    <div id="main-app" style="display: none;">
+        <header>
+    <div class="header-content">
+        <h2>GateMonitor</h2>
+        <div id="current-user-info">
+            Logget ind som: <span id="current-guard-display"></span>
+        </div>
+    </div>
+    <!-- Tilføjet mute-knap -->
+    <button id="mute-button" class="icon-button">🔊</button>
+    <nav>
+        <button id="nav-overvaagning" class="tab-button active">Overvågning</button>
+        <button id="nav-gates" class="tab-button">Gates</button>
+    </nav>
+</header>
+
+        <main>
+            <!-- Faneblad 1: Overvågning -->
+            <section id="overvaagning-content">
+                <!-- Gate-kort genereres dynamisk af app.js og indsættes her -->
+            </section>
+
+            <!-- Faneblad 2: Gates Dashboard -->
+            <section id="gates-content" style="display: none;">
+                <!-- Sektioner for A-gates, B-gates etc. genereres dynamisk her -->
+            </section>
+        </main>
+    </div>
+
+    <!-- ## GATE-DETALJER MODAL/POP-UP (§5) ## -->
+    <!-- En genbrugelig modal, der er skjult som standard -->
+    <div id="gate-details-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close-button">×</button>
+            <div id="modal-gate-info">
+                <!-- Indhold indsættes dynamisk -->
+                <!-- Eksempel:
+                <h3 class="gate-name">A10</h3>
+                <p>Type: <span class="gate-type">ARR</span></p>
+                <p>Planlagt tid: <span class="gate-scheduled-time">14:30</span></p>
+                <p>Overvågning: <span class="gate-timer">00:00:00</span></p>
+                <p>Skærmvalg: <span class="gate-screen">Ikke valgt</span></p>
+                -->
+            </div>
+            <nav id="modal-gate-actions" class="gate-actions-menu">
+                <!-- Handlinger/knapper indsættes dynamisk -->
+            </nav>
+        </div>
+    </div>
+
+    <!-- ## LYDELEMENT TIL NOTIFIKATIONER (§6) ## -->
+    <audio id="notification-sound" src="assets/notification.mp3" preload="auto"></audio>
+
+    <!-- ## SCRIPTS ## -->
+    <!-- Firebase SDK (vi antager brug af CDN for nu) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
+    <!-- ## SCRIPTS ## -->
+    <!-- Vi bruger type="module" til at understøtte import/export syntax -->
+    <script type="module" src="config.js"></script> 
+    <script type="module" src="utils.js"></script>
+    <script type="module" src="data.js"></script>
+    <script type="module" src="ui.js"></script>
+    <script type="module" src="app.js"></script>    <!-- Hovedlogik, samler trådene -->
+
+</body>
+</html>
