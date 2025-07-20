@@ -8,9 +8,9 @@ import {
   onSnapshot,
   doc,
   runTransaction,
-  getDocs,
   updateDoc,
   arrayUnion,
+  getDocs, // <-- VIGTIG!
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /**
@@ -56,16 +56,14 @@ export async function nulstilAlleGates() {
     monitor_start: null,
     monitor_stop: null,
     screen: null,
-    // Vi nulstiller IKKE scheduled_time eller history
   };
 
-  // Loop igennem alle dokumenter og opdater dem
   const updatePromises = [];
-  snapshot.forEach((doc) => {
-    updatePromises.push(updateDoc(doc.ref, resetData));
+  snapshot.forEach((docRef) => {
+    // Bemærk: 'docRef.ref' bruges til at hente referencen fra et query document snapshot
+    updatePromises.push(updateDoc(docRef.ref, resetData));
   });
 
-  // Vent på at alle opdateringer er færdige
   await Promise.all(updatePromises);
 
   console.log(`${snapshot.size} gates blev nulstillet.`);
