@@ -290,11 +290,59 @@ function init() {
       state.currentGuardId = guardButton.dataset.guardId;
       UI.showMainApp(state.currentGuardId);
       renderMainView();
-    } else if (gateCard) {
-      const gateId = gateCard.dataset.gateId;
-      const gate = state.allGates.find((g) => g.id === gateId);
-      if (gate)
-        UI.showGateDetailsModal(gate, state.currentGuardId, state.activeTimers);
+else if (modalAction) {
+        const action = modalAction.dataset.action;
+
+        // Logik for at håndtere den nye redigeringsformular
+        if (action === 'save-changes') {
+            const form = document.getElementById('edit-gate-form');
+            const gateId = document.querySelector('.modal-content .gate-name').dataset.gateId;
+            
+            const newGuard = form.querySelector('#gate-guard').value;
+            const newTimeValue = form.querySelector('#gate-time').value;
+
+            const updatedData = {
+                // Konverter den lokale tid tilbage til et rigtigt JS Date-objekt
+                scheduled_time: newTimeValue ? new Date(newTimeValue) : null,
+                responsible_guard: newGuard === 'null' ? null : newGuard,
+                status: form.querySelector('#gate-status').value
+            };
+            
+            await Data.opdaterGate(gateId, updatedData);
+            UI.hideGateDetailsModal();
+            return; // Stop videre behandling
+        }
+
+        if (action === 'cancel-edit') {
+            UI.hideGateDetailsModal();
+            return;
+        }
+
+         const gateNameElement = document.querySelector('.modal-content .gate-name');
+        if (!gateNameElement) return; // Sikkerhedstjek
+
+        // Denne logik bruges nu kun af den gamle handlings-dialog
+        const gateId = gateNameElement.textContent.toLowerCase();
+        
+        const actions = {
+            "tag-gate": handleTagGate,
+            "start-monitor": handleStartMonitor,
+            "skift-til-departure": handleSwitchToDeparture,
+            "add-5-min": handleAdd5Minutes,
+            "markoer-faerdig": handleMarkAsFinished,
+            "afgiv-gate": handleReleaseGate,
+            slet: () => {
+                if (confirm("Er du sikker?")) {
+                    alert("Slet-funktion ikke implementeret.");
+                    UI.hideGateDetailsModal();
+                }
+            },
+        };
+
+        if (actions[action]) {
+            await actions[action](gateId);
+        }
+    }
     } else if (modalAction) {
       const gateId = document
         .querySelector(".modal-content .gate-name")

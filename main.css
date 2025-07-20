@@ -181,6 +181,28 @@ main {
     color: var(--color-red);
 }
 
+/* main.css - TILFØJ DENNE STYLING */
+.gate-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+.gate-edit-form label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.gate-edit-form input, .gate-edit-form select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+.primary-action {
+    background-color: var(--color-blue) !important;
+    color: white;
+    border-color: var(--color-blue) !important;
+}
 /* ## GATE-DETALJER MODAL (§5) ## */
 .modal-overlay {
     position: fixed;
