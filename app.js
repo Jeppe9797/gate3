@@ -77,26 +77,25 @@ async function handleSwitchToDeparture(gateId) {
 }
 
 /**
- * Håndterer klik på "+5 minutter". (§15)
+ * Håndterer klik på "+5 minutter". Bruger nu en increment-operation. (§15)
  * @param {string} gateId
  */
 async function handleAdd5Minutes(gateId) {
-  const gate = state.allGates.find((g) => g.id === gateId);
-  // Dette er en avanceret handling. En simpel løsning er at opdatere sluttidspunktet.
-  // Vi antager et felt 'monitor_stop_expected' som opdateres.
-  const newStopTime = new Date(
-    state.activeTimers[gateId].stopTime.getTime() + 5 * 60 * 1000,
-  );
+  try {
+    // Kald den nye, sikre funktion i data.js
+    await Data.addExtraTime(gateId, 5);
 
-  const updates = {
-    monitor_stop_expected: newStopTime, // Fiktivt felt for at illustrere
-    history: Data.arrayUnion({
-      timestamp: new Date(),
-      event: `+5 minutter tilføjet af ${state.currentGuardId}`,
-    }),
-  };
-  await Data.opdaterGate(gateId, updates);
-  UI.hideGateDetailsModal();
+    // Log hændelsen som før
+    await Data.logHistorik(
+      gateId,
+      `+5 minutter tilføjet af ${state.currentGuardId}`,
+    );
+
+    UI.hideGateDetailsModal();
+  } catch (error) {
+    alert("Kunne ikke tilføje ekstra tid. Prøv igen.");
+    console.error("Fejl i handleAdd5Minutes:", error);
+  }
 }
 
 /**
@@ -188,15 +187,22 @@ function updateActiveTimers() {
   const activeGateIds = new Set();
 
   state.allGates.forEach((gate) => {
-    // En timer er kun aktiv, hvis gaten er 'green' og har en starttid.
     if (gate.status === "green" && gate.monitor_start) {
       activeGateIds.add(gate.id);
 
       if (!state.activeTimers[gate.id]) {
         // Ny aktiv timer
         const startTime = gate.monitor_start.toDate().getTime();
-        const duration = (gate.type === "ARR" ? 25 : 30) * 60 * 1000; // 25 min for ARR, 30 for DEP
-        const stopTime = startTime + duration;
+
+        // ## HER ER ÆNDRINGEN ##
+        // Læs ekstra tid fra gaten. Hvis feltet ikke findes, er det 0.
+        const extraMinutes = gate.extra_time_minutes || 0;
+        // Beregn den samlede varighed
+        const baseDurationMinutes = gate.type === "ARR" ? 25 : 30;
+        const totalDurationMs =
+          (baseDurationMinutes + extraMinutes) * 60 * 1000;
+
+        const stopTime = startTime + totalDurationMs;
 
         state.activeTimers[gate.id] = {
           stopTime: stopTime,
@@ -208,7 +214,7 @@ function updateActiveTimers() {
     }
   });
 
-  // Fjern timere for gates, der ikke længere er aktive
+  // Fjern timere for gates, der ikke længere er aktive (denne del er uændret)
   for (const gateId in state.activeTimers) {
     if (!activeGateIds.has(gateId)) {
       delete state.activeTimers[gateId];
@@ -353,10 +359,10 @@ function init() {
       const gateNameElement = document.querySelector(
         ".modal-content .gate-name",
       );
-      if (!gateNameElement) return; // Sikkerhedstjek
+      if (!gateNameElement) return;
 
-      // Denne logik bruges nu kun af den gamle handlings-dialog
-      const gateId = gateNameElement.textContent.toLowerCase();
+      // Brug data-attributten i stedet for textContent
+      const gateId = gateNameElement.dataset.gateId;
 
       const actions = {
         "tag-gate": handleTagGate,

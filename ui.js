@@ -73,8 +73,9 @@ function renderEditForm(gate) {
  */
 function renderActionView(gate, currentGuardId, activeTimers) {
   const timeRemaining = activeTimers[gate.id]?.remaining || 0;
+  // Tilføj data-gate-id til h3-elementet
   elements.modalContent.innerHTML = `
-        <h3 class="gate-name">${gate.gate_id.toUpperCase()}</h3>
+        <h3 class="gate-name" data-gate-id="${gate.id}">${gate.gate_id.toUpperCase()}</h3>
         <p>Type: <span class="gate-type">${gate.type}</span></p>
         <p>Planlagt tid: <span class="gate-scheduled-time">${formatTimestamp(gate.scheduled_time)}</span></p>
         <p>Status: <span class="gate-status">${gate.status}</span></p>
@@ -84,3 +85,24 @@ function renderActionView(gate, currentGuardId, activeTimers) {
   // Genbruger den eksisterende funktion til at lave handlingsknapper
   renderModalActions(gate, currentGuardId, timeRemaining);
 }
+
+/**
+ * Viser hovedapplikationen for den valgte vagt.
+ * @param {string} currentGuardId - Den nuværende vagts ID.
+ */
+export function showMainApp(guardId) {
+  elements.guardSelectionScreen.style.display = "none";
+  elements.currentGuardDisplay.textContent = guardId;
+  elements.mainApp.style.display = "block";
+}
+
+// MANGLENDE DEL: Definer referencer til DOM-elementer
+const elements = {
+  modal: document.getElementById("gate-details-modal"),
+  modalContent: document.getElementById("modal-gate-info"),
+  modalActions: document.getElementById("modal-gate-actions"),
+  guardSelectionScreen: document.getElementById("guard-selection-screen"),
+  mainApp: document.getElementById("main-app"),
+  currentGuardDisplay: document.getElementById("current-guard-display"),
+  // Tilføj andre elementer efter behov
+};

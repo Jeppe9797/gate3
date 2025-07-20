@@ -10,7 +10,8 @@ import {
   runTransaction,
   updateDoc,
   arrayUnion,
-  getDocs, // <-- VIGTIG!
+  getDocs,
+  increment, // <-- TILFØJ DENNE IMPORT
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 /**
@@ -103,5 +104,56 @@ export async function logHistorik(gateId, eventMessage) {
     });
   } catch (error) {
     console.error(`Kunne ikke logge historik for gate ${gateId}:`, error);
+  }
+}
+
+/**
+ * Tildeler en gate til en vagt ved hjælp af en transaktion.
+ * @param {string} gateId - ID'et på den gate, der skal tildeles.
+ * @param {string} guardId - ID'et på vagten, der skal tildeles gaten.
+ */
+export async function tagGate(gateId, guardId) {
+  const gateRef = doc(db, "gates", gateId);
+  try {
+    await runTransaction(db, async (transaction) => {
+      const gateDoc = await transaction.get(gateRef);
+      if (!gateDoc.exists()) {
+        throw new Error("Gaten findes ikke!");
+      }
+      const gateData = gateDoc.data();
+      if (gateData.responsible_guard) {
+        throw new Error(
+          `Gaten er allerede taget af ${gateData.responsible_guard}.`,
+        );
+      }
+      transaction.update(gateRef, {
+        responsible_guard: guardId,
+        status: "gray", // Eller en anden relevant status
+      });
+    });
+  } catch (e) {
+    console.error("Transaktion fejlede: ", e.message);
+    throw e; // Videresend fejlen til UI
+  }
+}
+
+/**
+ * Tilføjer ekstra tid til en gate ved at bruge Firestores atomiske increment-operation.
+ * @param {string} gateId - ID'et på gaten.
+ * @param {number} minutes - Antallet af minutter, der skal tilføjes.
+ */
+export async function addExtraTime(gateId, minutes) {
+  const gateRef = doc(db, "gates", gateId);
+  try {
+    await updateDoc(gateRef, {
+      // Forøger feltet 'extra_time_minutes' med den angivne værdi.
+      // Hvis feltet ikke eksisterer, bliver det oprettet med værdien.
+      extra_time_minutes: increment(minutes),
+    });
+  } catch (error) {
+    console.error(
+      `Fejl ved tilføjelse af ekstra tid til gate ${gateId}:`,
+      error,
+    );
   }
 }
