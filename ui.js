@@ -1,3 +1,4 @@
+import { formatSecondsToHMS, formatTimestamp } from "./utils.js";
 // js/ui.js - INDSÆT HELE DENNE BLOK
 
 /**
@@ -133,20 +134,76 @@ export function renderOvervaagningList(
               hour: "2-digit",
               minute: "2-digit",
             })
-          : "";
-      const statusText = gate.status || "";
+          : "N/A";
+      const statusText = gate.status || "Ukendt";
       const ansvarlig = gate.responsible_guard || "Ingen";
       const timer = activeTimers[gate.id]?.remaining || 0;
       return `
-      <div class="gate-card ${gate.status}">
-        <h4>${gate.gate_id || ""}</h4>
-        <p>Tid: ${time}</p>
-        <p>Status: ${statusText}</p>
-        <p>Ansvarlig: ${ansvarlig}</p>
-        <p>Overvågningstid: ${formatSecondsToHMS(timer)}</p>
+      <div class="gate-card ${gate.status}" data-gate-id="${gate.id}">
+        <h4>${gate.gate_id || "Ukendt Gate"}</h4>
+        <div class="gate-details-grid">
+            <span>Tid:</span> <span>${time}</span>
+            <span>Status:</span> <span>${statusText}</span>
+            <span>Ansvarlig:</span> <span>${ansvarlig}</span>
+            <span>Timer:</span> <span>${formatSecondsToHMS(timer)}</span>
+        </div>
       </div>
     `;
     })
+    .join("");
+}
+
+// Ny funktion: Tegner gate-listen i "Gates"-fanen, grupperet efter sektion
+/**
+ * Tegner gate-listen i "Gates"-fanen, grupperet efter sektion.
+ * @param {Array<object>} gates - Den sorterede liste af alle gates.
+ */
+export function renderGatesDashboard(gates = []) {
+  const container = document.getElementById("gates-content");
+  if (!container) return;
+
+  if (!gates.length) {
+    container.innerHTML = "<p>Ingen gates fundet i systemet.</p>";
+    return;
+  }
+
+  // Gruppér gates (f.eks. efter første bogstav som A, B, etc.)
+  const groupedGates = gates.reduce((acc, gate) => {
+    const group = gate.gate_id
+      ? gate.gate_id.charAt(0).toUpperCase()
+      : "Ukendt";
+    if (!acc[group]) {
+      acc[group] = [];
+    }
+    acc[group].push(gate);
+    return acc;
+  }, {});
+
+  // Byg HTML for hver gruppe
+  container.innerHTML = Object.keys(groupedGates)
+    .sort()
+    .map(
+      (group) => `
+    <div class="gate-section">
+      <h2>Gates ${group}</h2>
+      <div class="gate-grid">
+        ${groupedGates[group]
+          .map((gate) => {
+            const time = formatTimestamp(gate.scheduled_time);
+            const ansvarlig = gate.responsible_guard || "Ledig";
+            return `
+            <div class="gate-card ${gate.status}" data-gate-id="${gate.id}">
+              <h4>${gate.gate_id}</h4>
+              <p>Planlagt: ${time}</p>
+              <p>Ansvarlig: ${ansvarlig}</p>
+            </div>
+          `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `,
+    )
     .join("");
 }
 

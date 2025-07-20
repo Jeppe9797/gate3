@@ -155,11 +155,11 @@ main {
 }
 
 /* Status farver (§4) */
-.gate-card.status-green { border-left-color: var(--color-green); }
-.gate-card.status-gray { border-left-color: var(--color-gray); }
-.gate-card.status-yellow { border-left-color: var(--color-yellow); }
-.gate-card.status-red { border-left-color: var(--color-red); }
-.gate-card.status-blue { border-left-color: var(--color-blue); }
+.gate-card.green { border-left-color: var(--color-green); }
+.gate-card.gray { border-left-color: var(--color-gray); }
+.gate-card.yellow { border-left-color: var(--color-yellow); }
+.gate-card.red { border-left-color: var(--color-red); }
+.gate-card.blue { border-left-color: var(--color-blue); }
 
 .gate-card h3 {
     margin: 0 0 10px 0;

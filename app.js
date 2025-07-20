@@ -385,7 +385,11 @@ function init() {
     } else if (tabButton) {
       UI.switchTab(tabButton.id);
       if (tabButton.id === "nav-gates") {
-        UI.renderGatesDashboard(state.allGates);
+        // Sortér gates efter navn, når 'Gates'-fanen vælges
+        const sortedGatesForDashboard = [...state.allGates].sort((a, b) =>
+          a.gate_id.localeCompare(b.gate_id),
+        );
+        UI.renderGatesDashboard(sortedGatesForDashboard);
       }
     } else if (closeModal) {
       UI.hideGateDetailsModal();
