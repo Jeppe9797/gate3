@@ -11,7 +11,9 @@
     <link rel="apple-touch-icon" href="images/icon-192.png">
 </head>
 <body>
-
+ <button onclick="seedDatabase()" style="position:fixed; top:10px; left:10px; z-index:9999; padding:10px; background-color:crimson; color:white; border:none; cursor:pointer;">
+        SEED DATABASE
+    </button>
     <!-- ## OFFLINE BANNER (§9) ## -->
     <!-- Vises kun når forbindelsen mistes -->
     <div id="offline-banner" class="banner" style="display: none;">
@@ -101,6 +103,7 @@
     <script type="module" src="data.js"></script>
     <script type="module" src="ui.js"></script>
     <script type="module" src="app.js"></script>    <!-- Hovedlogik, samler trådene -->
+    <script type="module" src="js/seed.js"></script>
 
 </body>
 </html>
