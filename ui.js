@@ -49,13 +49,19 @@ function renderEditForm(gate) {
         <form id="edit-gate-form" class="gate-edit-form">
             <label for="gate-time">Planlagt Tid:</label>
             <input type="datetime-local" id="gate-time" value="${formatTimestampForInput(gate.scheduled_time)}">
-            
+
             <label for="gate-guard">Ansvarlig Vagt:</label>
             <select id="gate-guard">
                 <option value="null" ${!gate.responsible_guard ? "selected" : ""}>Ingen</option>
                 <option value="Guard 1" ${gate.responsible_guard === "Guard 1" ? "selected" : ""}>Guard 1</option>
                 <option value="Guard 2" ${gate.responsible_guard === "Guard 2" ? "selected" : ""}>Guard 2</option>
                 <option value="Guard 3" ${gate.responsible_guard === "Guard 3" ? "selected" : ""}>Guard 3</option>
+            </select>
+
+            <label for="gate-type">Gate-type:</label>
+            <select id="gate-type">
+                <option value="ARR" ${gate.type === "ARR" ? "selected" : ""}>Arrival (ARR)</option>
+                <option value="DEP" ${gate.type === "DEP" ? "selected" : ""}>Departure (DEP)</option>
             </select>
 
             <label for="gate-status">Status:</label>
