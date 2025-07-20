@@ -283,90 +283,13 @@ function init() {
       e.target.closest(".modal-close-button") ||
       e.target.classList.contains("modal-overlay");
     const muteButton = e.target.closest("#mute-button");
-    const tabButton = e.target.closest(".tab-button"); // <-- ÆNDRING 1
+    const tabButton = e.target.closest(".tab-button");
     const resetButton = e.target.closest("#reset-all-button");
 
     if (guardButton) {
       state.currentGuardId = guardButton.dataset.guardId;
       UI.showMainApp(state.currentGuardId);
       renderMainView();
-    } else if (modalAction) {
-      const action = modalAction.dataset.action;
-
-      // Logik for at håndtere den nye redigeringsformular
-      if (action === "save-changes") {
-        const form = document.getElementById("edit-gate-form");
-        const gateId = document.querySelector(".modal-content .gate-name")
-          .dataset.gateId;
-
-        const newGuard = form.querySelector("#gate-guard").value;
-        const newTimeValue = form.querySelector("#gate-time").value;
-
-        const updatedData = {
-          // Konverter den lokale tid tilbage til et rigtigt JS Date-objekt
-          scheduled_time: newTimeValue ? new Date(newTimeValue) : null,
-          responsible_guard: newGuard === "null" ? null : newGuard,
-          status: form.querySelector("#gate-status").value,
-        };
-
-        await Data.opdaterGate(gateId, updatedData);
-        UI.hideGateDetailsModal();
-        return; // Stop videre behandling
-      }
-
-      if (action === "cancel-edit") {
-        UI.hideGateDetailsModal();
-        return;
-      }
-
-      const gateNameElement = document.querySelector(
-        ".modal-content .gate-name",
-      );
-      if (!gateNameElement) return;
-
-      const gateId = gateNameElement.textContent.toLowerCase();
-
-      const actions = {
-        "tag-gate": handleTagGate,
-        "start-monitor": handleStartMonitor,
-        "skift-til-departure": handleSwitchToDeparture,
-        "add-5-min": handleAdd5Minutes,
-        "markoer-faerdig": handleMarkAsFinished,
-        "afgiv-gate": handleReleaseGate,
-        slet: () => {
-          if (confirm("Er du sikker?")) {
-            alert("Slet-funktion ikke implementeret.");
-            UI.hideGateDetailsModal();
-          }
-        },
-      };
-
-      if (actions[action]) {
-        await actions[action](gateId);
-      }
-    } else if (closeModal) {
-      UI.hideGateDetailsModal();
-    } else if (muteButton) {
-      state.isMuted = !state.isMuted;
-      UI.setMuteButtonState(state.isMuted);
-    } else if (resetButton) {
-      const confirmed = confirm(
-        "Er du sikker på, at du vil nulstille ALLE gates? Dette fjerner alle vagttildelinger og aktive overvågninger.",
-      );
-      if (confirmed) {
-        try {
-          const count = await Data.nulstilAlleGates();
-          alert(`${count} gates blev succesfuldt nulstillet.`);
-        } catch (error) {
-          alert("Der opstod en fejl under nulstilling.");
-          console.error("Fejl ved nulstilling af gates:", error);
-        }
-      }
-    } else if (tabButton) {
-      UI.switchTab(tabButton.id);
-      if (tabButton.id === "nav-gates") {
-        UI.renderGatesDashboard(state.allGates);
-      }
     } else if (gateCard) {
       // TEST 1: Finder den overhovedet et gate-kort?
       console.log("✅ TRIN 1: Gate-kort fundet!", gateCard);
@@ -398,6 +321,83 @@ function init() {
         console.error(
           "❌ FEJL: Kunne ikke kalde showGateDetailsModal, fordi gate-objektet var 'null' eller 'undefined'.",
         );
+      }
+    } else if (modalAction) {
+      const action = modalAction.dataset.action;
+
+      // Logik for at håndtere den nye redigeringsformular
+      if (action === "save-changes") {
+        const form = document.getElementById("edit-gate-form");
+        const gateId = document.querySelector(".modal-content .gate-name")
+          .dataset.gateId;
+
+        const newGuard = form.querySelector("#gate-guard").value;
+        const newTimeValue = form.querySelector("#gate-time").value;
+
+        const updatedData = {
+          scheduled_time: newTimeValue ? new Date(newTimeValue) : null,
+          responsible_guard: newGuard === "null" ? null : newGuard,
+          status: form.querySelector("#gate-status").value,
+        };
+
+        await Data.opdaterGate(gateId, updatedData);
+        UI.hideGateDetailsModal();
+        return; // Stop videre behandling
+      }
+
+      if (action === "cancel-edit") {
+        UI.hideGateDetailsModal();
+        return;
+      }
+
+      const gateNameElement = document.querySelector(
+        ".modal-content .gate-name",
+      );
+      if (!gateNameElement) return; // Sikkerhedstjek
+
+      // Denne logik bruges nu kun af den gamle handlings-dialog
+      const gateId = gateNameElement.textContent.toLowerCase();
+
+      const actions = {
+        "tag-gate": handleTagGate,
+        "start-monitor": handleStartMonitor,
+        "skift-til-departure": handleSwitchToDeparture,
+        "add-5-min": handleAdd5Minutes,
+        "markoer-faerdig": handleMarkAsFinished,
+        "afgiv-gate": handleReleaseGate,
+        slet: () => {
+          if (confirm("Er du sikker?")) {
+            alert("Slet-funktion ikke implementeret.");
+            UI.hideGateDetailsModal();
+          }
+        },
+      };
+
+      if (actions[action]) {
+        await actions[action](gateId);
+      }
+    } else if (tabButton) {
+      UI.switchTab(tabButton.id);
+      if (tabButton.id === "nav-gates") {
+        UI.renderGatesDashboard(state.allGates);
+      }
+    } else if (closeModal) {
+      UI.hideGateDetailsModal();
+    } else if (muteButton) {
+      state.isMuted = !state.isMuted;
+      UI.setMuteButtonState(state.isMuted);
+    } else if (resetButton) {
+      const confirmed = confirm(
+        "Er du sikker på, at du vil nulstille ALLE gates? Dette fjerner alle vagttildelinger og aktive overvågninger.",
+      );
+      if (confirmed) {
+        try {
+          const count = await Data.nulstilAlleGates();
+          alert(`${count} gates blev succesfuldt nulstillet.`);
+        } catch (error) {
+          alert("Der opstod en fejl under nulstilling.");
+          console.error("Fejl ved nulstilling af gates:", error);
+        }
       }
     }
   });
