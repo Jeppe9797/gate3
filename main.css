@@ -91,9 +91,15 @@ body {
     align-items: center;
     margin-bottom: 10px;
 }
+.header-controls {
+    display: flex;         /* Arranger elementer på en linje */
+    align-items: center;   /* Centrer dem vertikalt */
+    gap: 15px;             /* Tilføj lidt luft mellem knapper og nav-bar */
+}
 #main-app nav {
     display: flex;
     gap: 10px;
+    flex-grow: 1; /* <-- VIGTIG! Denne linje får nav-baren til at strække sig */
 }
 .tab-button {
     flex-grow: 1;
@@ -110,14 +116,18 @@ body {
 }
 
 #mute-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
+    /* Fjern disse linjer, hvis du har dem */
+    /* position: absolute; */
+    /* top: 10px; */
+    /* right: 15px; */
+
+    /* Bevar disse (eller tilføj dem for konsistens) */
     background: none;
     border: none;
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
+    padding: 0; /* Nulstil padding for at justere pænt */
 }
 
 /* ## GATE LISTER & KORT (§3, 4) ## */
@@ -226,4 +236,13 @@ main {
     color: var(--color-red);
     font-size: 0.9rem;
     margin-top: 10px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
 }
