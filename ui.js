@@ -190,3 +190,54 @@ export function updateGuardSelectionUI(takenGuards) {
     }
   });
 }
+// ui.js - TILFØJ DISSE NYE FUNKTIONER
+
+/**
+ * Skifter det aktive faneblad og det synlige indhold.
+ * @param {string} targetTabId - ID'et på den fane-knap, der blev klikket på (f.eks. 'nav-gates').
+ */
+export function switchTab(targetTabId) {
+  const isOvervaagning = targetTabId === "nav-overvaagning";
+
+  // Skjul/vis de rigtige content-sektioner
+  elements.overvaagningContent.style.display = isOvervaagning ? "grid" : "none";
+  elements.gatesContent.style.display = isOvervaagning ? "none" : "grid";
+
+  // Opdater den aktive klasse på knapperne
+  elements.navOvervaagning.classList.toggle("active", isOvervaagning);
+  elements.navGates.classList.toggle("active", !isOvervaagning);
+}
+
+/**
+ * Opdaterer "Gates"-dashboardet, grupperet efter sektion. (§3)
+ * (Dette er en simpel version - kan udvides senere)
+ * @param {Array<object>} gates - En liste af alle gate-objekter.
+ */
+export function renderGatesDashboard(gates) {
+  elements.gatesContent.innerHTML = ""; // Ryd gammelt indhold
+
+  // Gruppér gates efter første bogstav (f.eks. 'A10' -> 'A')
+  const gatesBySection = gates.reduce((acc, gate) => {
+    const section = gate.gate_id.charAt(0).toUpperCase();
+    if (!acc[section]) {
+      acc[section] = [];
+    }
+    acc[section].push(gate);
+    return acc;
+  }, {});
+
+  // Opret en sektion for hver gruppe
+  for (const section in gatesBySection) {
+    const sectionDiv = document.createElement("div");
+    sectionDiv.className = "gate-section";
+    sectionDiv.innerHTML = `<h2>${section}-Gates</h2>`;
+
+    gatesBySection[section].forEach((gate) => {
+      // Vi kan genbruge createGateCard-funktionen, men uden timer
+      const card = createGateCard(gate, null, {}); // Vi sender null som guardId for at få default farver
+      sectionDiv.appendChild(card);
+    });
+
+    elements.gatesContent.appendChild(sectionDiv);
+  }
+}

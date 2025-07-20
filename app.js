@@ -283,6 +283,7 @@ function init() {
       e.target.closest(".modal-close-button") ||
       e.target.classList.contains("modal-overlay");
     const muteButton = e.target.closest("#mute-button");
+    const tabButton = e.target.closest(".tab-button"); // <-- ÆNDRING 1
 
     if (guardButton) {
       state.currentGuardId = guardButton.dataset.guardId;
@@ -299,7 +300,6 @@ function init() {
         .textContent.toLowerCase();
       const action = modalAction.dataset.action;
 
-      // Map action til den rigtige funktion
       const actions = {
         "tag-gate": handleTagGate,
         "start-monitor": handleStartMonitor,
@@ -318,7 +318,17 @@ function init() {
       if (actions[action]) {
         await actions[action](gateId);
       }
-    } else if (closeModal) {
+    }
+
+    // ---- ÆNDRING 2 (HELE DENNE BLOK ER NY) ----
+    else if (tabButton) {
+      UI.switchTab(tabButton.id);
+      if (tabButton.id === "nav-gates") {
+        UI.renderGatesDashboard(state.allGates);
+      }
+    }
+    // ------------------------------------------
+    else if (closeModal) {
       UI.hideGateDetailsModal();
     } else if (muteButton) {
       state.isMuted = !state.isMuted;
